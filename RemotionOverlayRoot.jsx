@@ -1,1 +1,308 @@
-{"content":"import React, { useState, useEffect } from \"react\";\nimport { ThreeJsRecorder } from \"./ThreeJsRecorder.jsx\";\n\nexport const RemotionOverlay = () => {\n    const [replayData, setReplayData] = useState(null);\n    const [recordedUrl, setRecordedUrl] = useState(null);\n    const [error, setError] = useState(null);\n\n    useEffect(() => {\n        const handleReplay = (e) => {\n            console.log(\"Overlay received render-replay\", e.detail);\n            setReplayData(e.detail);\n            setRecordedUrl(null);\n            setError(null);\n        };\n        const handleClose = () => {\n            setReplayData(null);\n            setRecordedUrl(null);\n            setError(null);\n        };\n\n        window.addEventListener(\"render-replay\", handleReplay);\n        window.addEventListener(\"close-replay\", handleClose);\n        return () => {\n            window.removeEventListener(\"render-replay\", handleReplay);\n            window.removeEventListener(\"close-replay\", handleClose);\n        };\n    }, []);\n\n    const handleComplete = (url) => {\n        setRecordedUrl(url);\n        // Notify dashboard\n        window.dispatchEvent(\n            new CustomEvent(\"render-complete\", { detail: { success: true, url } }),\n        );\n    };\n\n    const handleError = (msg) => {\n        setError(msg);\n        window.dispatchEvent(\n            new CustomEvent(\"render-complete\", {\n                detail: { success: false, error: msg },\n            }),\n        );\n    };\n\n    const downloadVideo = () => {\n        if (recordedUrl) {\n            const a = document.createElement(\"a\");\n            a.href = recordedUrl;\n            a.download = `skydrop-replay-${new Date()\n                .toISOString()\n                .replace(/:/g, \"-\")}.webm`;\n            document.body.appendChild(a);\n            a.click();\n            document.body.removeChild(a);\n        }\n    };\n\n    if (!replayData) return null;\n\n    return (\n        <div\n            style={{\n                position: \"absolute\",\n                top: 0,\n                left: 0,\n                width: \"100%\",\n                height: \"100%\",\n                zIndex: 99999,\n                pointerEvents: \"auto\",\n                background: \"#000000\",\n                display: \"flex\",\n                alignItems: \"center\",\n                justifyContent: \"center\",\n            }}\n        >\n            {!recordedUrl && !error && (\n                <ThreeJsRecorder\n                    data={replayData}\n                    onComplete={handleComplete}\n                    onError={handleError}\n                />\n            )}\n\n            {(recordedUrl || error) && (\n                <div\n                    style={{\n                        width: \"100%\",\n                        height: \"100%\",\n                        display: \"flex\",\n                        alignItems: \"center\",\n                        justifyContent: \"center\",\n                        flexDirection: \"column\",\n                    }}\n                >\n                    <div\n                        style={{\n                            background: \"#222\",\n                            padding: \"40px\",\n                            borderRadius: \"20px\",\n                            textAlign: \"center\",\n                            border: \"2px solid #555\",\n                            maxWidth: \"500px\",\n                        }}\n                    >\n                        {error ? (\n                            <>\n                                <h2\n                                    style={{\n                                        color: \"#ff4444\",\n                                        marginBottom: \"20px\",\n                                    }}\n                                >\n                                    RENDER FAILED\n                                </h2>\n                                <p\n                                    style={{\n                                        color: \"#aaa\",\n                                        marginBottom: \"30px\",\n                                        cursor: \"pointer\",\n                                        border: \"1px solid #444\",\n                                        padding: \"10px\",\n                                        borderRadius: \"5px\",\n                                    }}\n                                    onClick={() => {\n                                        if (navigator.clipboard)\n                                            navigator.clipboard.writeText(error);\n                                    }}\n                                    title=\"Click to copy error\"\n                                >\n                                    {error}\n                                    <br />\n                                    <span\n                                        style={{\n                                            fontSize: \"0.8rem\",\n                                            color: \"#666\",\n                                        }}\n                                    >\n                                        (Click to copy)\n                                    </span>\n                                </p>\n                            </>\n                        ) : (\n                            <>\n                                <h2\n                                    style={{\n                                        color: \"white\",\n                                        marginBottom: \"30px\",\n                                    }}\n                                >\n                                    REPLAY READY\n                                </h2>\n                                <video\n                                    src={recordedUrl}\n                                    controls\n                                    autoPlay\n                                    loop\n                                    style={{\n                                        width: \"100%\",\n                                        marginBottom: \"20px\",\n                                        borderRadius: \"8px\",\n                                        border: \"1px solid #444\",\n                                    }}\n                                />\n                                <button\n                                    onClick={downloadVideo}\n                                    style={{\n                                        padding: \"15px 30px\",\n                                        fontSize: \"20px\",\n                                        fontWeight: \"bold\",\n                                        color: \"white\",\n                                        background: \"#00cc00\",\n                                        border: \"none\",\n                                        borderRadius: \"10px\",\n                                        cursor: \"pointer\",\n                                        marginBottom: \"15px\",\n                                        width: \"100%\",\n                                    }}\n                                >\n                                    SAVE TO DEVICE\n                                </button>\n                            </>\n                        )}\n                        <button\n                            onClick={() =>\n                                window.dispatchEvent(\n                                    new CustomEvent(\"close-replay\"),\n                                )\n                            }\n                            style={{\n                                padding: \"15px 30px\",\n                                fontSize: \"16px\",\n                                color: \"#aaa\",\n                                background: \"transparent\",\n                                border: \"2px solid \"#555\",\n                                borderRadius: \"10px\",\n                                cursor: \"pointer\",\n                                width: \"100%\",\n                            }}\n                        >\n                            CLOSE\n                        </button>\n                    </div>\n                </div>\n            )}\n        </div>\n    );\n};\n\n"}
+import { Fragment, jsxDEV } from "react/jsx-dev-runtime";
+import React, { useState, useEffect } from "react";
+import { ThreeJsRecorder } from "./ThreeJsRecorder.jsx";
+const RemotionOverlay = () => {
+  const [replayData, setReplayData] = useState(null);
+  const [recordedUrl, setRecordedUrl] = useState(null);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const handleReplay = (e) => {
+      console.log("Overlay received render-replay", e.detail);
+      setReplayData(e.detail);
+      setRecordedUrl(null);
+      setError(null);
+    };
+    const handleClose = () => {
+      setReplayData(null);
+      setRecordedUrl(null);
+      setError(null);
+    };
+    window.addEventListener("render-replay", handleReplay);
+    window.addEventListener("close-replay", handleClose);
+    return () => {
+      window.removeEventListener("render-replay", handleReplay);
+      window.removeEventListener("close-replay", handleClose);
+    };
+  }, []);
+  const handleComplete = (url) => {
+    setRecordedUrl(url);
+    window.dispatchEvent(
+      new CustomEvent("render-complete", { detail: { success: true, url } })
+    );
+  };
+  const handleError = (msg) => {
+    setError(msg);
+    window.dispatchEvent(
+      new CustomEvent("render-complete", {
+        detail: { success: false, error: msg }
+      })
+    );
+  };
+  const downloadVideo = () => {
+    if (recordedUrl) {
+      const a = document.createElement("a");
+      a.href = recordedUrl;
+      a.download = `skydrop-replay-${(/* @__PURE__ */ new Date()).toISOString().replace(/:/g, "-")}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+  if (!replayData) return null;
+  return /* @__PURE__ */ jsxDEV(
+    "div",
+    {
+      style: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 99999,
+        pointerEvents: "auto",
+        background: "#000000",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      },
+      children: [
+        !recordedUrl && !error && /* @__PURE__ */ jsxDEV(
+          ThreeJsRecorder,
+          {
+            data: replayData,
+            onComplete: handleComplete,
+            onError: handleError
+          },
+          void 0,
+          false,
+          {
+            fileName: "<stdin>",
+            lineNumber: 79,
+            columnNumber: 17
+          }
+        ),
+        (recordedUrl || error) && /* @__PURE__ */ jsxDEV(
+          "div",
+          {
+            style: {
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column"
+            },
+            children: /* @__PURE__ */ jsxDEV(
+              "div",
+              {
+                style: {
+                  background: "#222",
+                  padding: "40px",
+                  borderRadius: "20px",
+                  textAlign: "center",
+                  border: "2px solid #555",
+                  maxWidth: "500px"
+                },
+                children: [
+                  error ? /* @__PURE__ */ jsxDEV(Fragment, { children: [
+                    /* @__PURE__ */ jsxDEV(
+                      "h2",
+                      {
+                        style: {
+                          color: "#ff4444",
+                          marginBottom: "20px"
+                        },
+                        children: "RENDER FAILED"
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "<stdin>",
+                        lineNumber: 109,
+                        columnNumber: 33
+                      }
+                    ),
+                    /* @__PURE__ */ jsxDEV(
+                      "p",
+                      {
+                        style: {
+                          color: "#aaa",
+                          marginBottom: "30px",
+                          cursor: "pointer",
+                          border: "1px solid #444",
+                          padding: "10px",
+                          borderRadius: "5px"
+                        },
+                        onClick: () => {
+                          if (navigator.clipboard)
+                            navigator.clipboard.writeText(error);
+                        },
+                        title: "Click to copy error",
+                        children: [
+                          error,
+                          /* @__PURE__ */ jsxDEV("br", {}, void 0, false, {
+                            fileName: "<stdin>",
+                            lineNumber: 133,
+                            columnNumber: 37
+                          }),
+                          /* @__PURE__ */ jsxDEV(
+                            "span",
+                            {
+                              style: {
+                                fontSize: "0.8rem",
+                                color: "#666"
+                              },
+                              children: "(Click to copy)"
+                            },
+                            void 0,
+                            false,
+                            {
+                              fileName: "<stdin>",
+                              lineNumber: 134,
+                              columnNumber: 37
+                            }
+                          )
+                        ]
+                      },
+                      void 0,
+                      true,
+                      {
+                        fileName: "<stdin>",
+                        lineNumber: 117,
+                        columnNumber: 33
+                      }
+                    )
+                  ] }, void 0, true, {
+                    fileName: "<stdin>",
+                    lineNumber: 108,
+                    columnNumber: 29
+                  }) : /* @__PURE__ */ jsxDEV(Fragment, { children: [
+                    /* @__PURE__ */ jsxDEV(
+                      "h2",
+                      {
+                        style: {
+                          color: "white",
+                          marginBottom: "30px"
+                        },
+                        children: "REPLAY READY"
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "<stdin>",
+                        lineNumber: 146,
+                        columnNumber: 33
+                      }
+                    ),
+                    /* @__PURE__ */ jsxDEV(
+                      "video",
+                      {
+                        src: recordedUrl,
+                        controls: true,
+                        autoPlay: true,
+                        loop: true,
+                        style: {
+                          width: "100%",
+                          marginBottom: "20px",
+                          borderRadius: "8px",
+                          border: "1px solid #444"
+                        }
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "<stdin>",
+                        lineNumber: 154,
+                        columnNumber: 33
+                      }
+                    ),
+                    /* @__PURE__ */ jsxDEV(
+                      "button",
+                      {
+                        onClick: downloadVideo,
+                        style: {
+                          padding: "15px 30px",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                          color: "white",
+                          background: "#00cc00",
+                          border: "none",
+                          borderRadius: "10px",
+                          cursor: "pointer",
+                          marginBottom: "15px",
+                          width: "100%"
+                        },
+                        children: "SAVE TO DEVICE"
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "<stdin>",
+                        lineNumber: 166,
+                        columnNumber: 33
+                      }
+                    )
+                  ] }, void 0, true, {
+                    fileName: "<stdin>",
+                    lineNumber: 145,
+                    columnNumber: 29
+                  }),
+                  /* @__PURE__ */ jsxDEV(
+                    "button",
+                    {
+                      onClick: () => window.dispatchEvent(
+                        new CustomEvent("close-replay")
+                      ),
+                      style: {
+                        padding: "15px 30px",
+                        fontSize: "16px",
+                        color: "#aaa",
+                        background: "transparent",
+                        border: "2px solid #555",
+                        borderRadius: "10px",
+                        cursor: "pointer",
+                        width: "100%"
+                      },
+                      children: "CLOSE"
+                    },
+                    void 0,
+                    false,
+                    {
+                      fileName: "<stdin>",
+                      lineNumber: 185,
+                      columnNumber: 25
+                    }
+                  )
+                ]
+              },
+              void 0,
+              true,
+              {
+                fileName: "<stdin>",
+                lineNumber: 97,
+                columnNumber: 21
+              }
+            )
+          },
+          void 0,
+          false,
+          {
+            fileName: "<stdin>",
+            lineNumber: 87,
+            columnNumber: 17
+          }
+        )
+      ]
+    },
+    void 0,
+    true,
+    {
+      fileName: "<stdin>",
+      lineNumber: 63,
+      columnNumber: 9
+    }
+  );
+};
+export {
+  RemotionOverlay
+};
