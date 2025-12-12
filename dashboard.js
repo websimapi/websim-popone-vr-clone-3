@@ -413,13 +413,17 @@ export class Dashboard {
             detail: replayData 
         }));
         
-        // Force exit VR to prevent rendering hang (browser throttles background tabs/renderers in VR)
-        const session = this.renderer.xr.getSession();
-        if (session) {
-            session.end();
-        }
-
-        this.updateBtn(1, "RENDERING...", '#555555');
+        // Update button to show status before exiting
+        this.updateBtn(1, "EXITING...", '#555555');
+        
+        // Force exit VR after a short delay to allow the React overlay to mount and receive data.
+        // Immediate exit can sometimes race with the event dispatch or page compositing.
+        setTimeout(() => {
+            const session = this.renderer.xr.getSession();
+            if (session) {
+                session.end();
+            }
+        }, 500);
     }
 
     exitReplay() {

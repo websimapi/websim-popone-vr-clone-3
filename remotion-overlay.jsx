@@ -326,9 +326,12 @@ const RemotionOverlay = () => {
     left: 0,
     width: "100%",
     height: "100%",
-    zIndex: 9999,
+    zIndex: 99999,
     pointerEvents: "auto",
-    background: "rgba(0,0,0,0.9)"
+    background: "#000000",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
   }, children: [
     !recordedUrl && !error && /* @__PURE__ */ jsxDEV(
       ThreeJsRecorder,
@@ -341,7 +344,7 @@ const RemotionOverlay = () => {
       false,
       {
         fileName: "<stdin>",
-        lineNumber: 374,
+        lineNumber: 375,
         columnNumber: 17
       }
     ),
@@ -363,7 +366,7 @@ const RemotionOverlay = () => {
       error ? /* @__PURE__ */ jsxDEV(Fragment, { children: [
         /* @__PURE__ */ jsxDEV("h2", { style: { color: "#ff4444", marginBottom: "20px" }, children: "RENDER FAILED" }, void 0, false, {
           fileName: "<stdin>",
-          lineNumber: 393,
+          lineNumber: 394,
           columnNumber: 33
         }),
         /* @__PURE__ */ jsxDEV(
@@ -378,12 +381,12 @@ const RemotionOverlay = () => {
               error,
               /* @__PURE__ */ jsxDEV("br", {}, void 0, false, {
                 fileName: "<stdin>",
-                lineNumber: 402,
+                lineNumber: 403,
                 columnNumber: 37
               }),
               /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "0.8rem", color: "#666" }, children: "(Click to copy)" }, void 0, false, {
                 fileName: "<stdin>",
-                lineNumber: 402,
+                lineNumber: 403,
                 columnNumber: 42
               })
             ]
@@ -392,18 +395,18 @@ const RemotionOverlay = () => {
           true,
           {
             fileName: "<stdin>",
-            lineNumber: 394,
+            lineNumber: 395,
             columnNumber: 33
           }
         )
       ] }, void 0, true, {
         fileName: "<stdin>",
-        lineNumber: 392,
+        lineNumber: 393,
         columnNumber: 29
       }) : /* @__PURE__ */ jsxDEV(Fragment, { children: [
         /* @__PURE__ */ jsxDEV("h2", { style: { color: "white", marginBottom: "30px" }, children: "REPLAY READY" }, void 0, false, {
           fileName: "<stdin>",
-          lineNumber: 407,
+          lineNumber: 408,
           columnNumber: 33
         }),
         /* @__PURE__ */ jsxDEV(
@@ -419,7 +422,7 @@ const RemotionOverlay = () => {
           false,
           {
             fileName: "<stdin>",
-            lineNumber: 408,
+            lineNumber: 409,
             columnNumber: 33
           }
         ),
@@ -445,13 +448,13 @@ const RemotionOverlay = () => {
           false,
           {
             fileName: "<stdin>",
-            lineNumber: 415,
+            lineNumber: 416,
             columnNumber: 33
           }
         )
       ] }, void 0, true, {
         fileName: "<stdin>",
-        lineNumber: 406,
+        lineNumber: 407,
         columnNumber: 29
       }),
       /* @__PURE__ */ jsxDEV(
@@ -474,17 +477,17 @@ const RemotionOverlay = () => {
         false,
         {
           fileName: "<stdin>",
-          lineNumber: 427,
+          lineNumber: 428,
           columnNumber: 25
         }
       )
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 387,
+      lineNumber: 388,
       columnNumber: 21
     }) }, void 0, false, {
       fileName: "<stdin>",
-      lineNumber: 382,
+      lineNumber: 383,
       columnNumber: 18
     })
   ] }, void 0, true, {
@@ -497,7 +500,7 @@ const root = document.getElementById("remotion-root");
 if (root) {
   createRoot(root).render(/* @__PURE__ */ jsxDEV(RemotionOverlay, {}, void 0, false, {
     fileName: "<stdin>",
-    lineNumber: 446,
+    lineNumber: 447,
     columnNumber: 29
   }));
 }
